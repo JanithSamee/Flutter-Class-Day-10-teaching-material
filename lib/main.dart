@@ -7,51 +7,63 @@ void main(List<String> args) {
   runApp(MaterialApp(
     home: Scaffold(
       appBar: AppBar(
-        title: const Text("Stream App"),
+        title: const Text("Form App"),
       ),
       body: const MyApp(),
     ),
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: CreateStream().getStream(),
-        builder: (context, snapshot) => Center(
-            child: snapshot.connectionState == ConnectionState.waiting
-                ? const CircularProgressIndicator()
-                : Text(
-                    "data : ${snapshot.data}",
-                    style: const TextStyle(fontSize: 24),
-                  )));
-  }
+  State<MyApp> createState() => _MyAppState();
 }
 
-class CreateStream {
-  final _controller = StreamController<dynamic>();
+class _MyAppState extends State<MyApp> {
+  final _formKey = GlobalKey<FormState>();
+  String? address = "";
 
-  CreateStream() {
-    _connect();
-  }
-
-  Future<void> _connect() async {
-    try {
-      final wsUrl = Uri.parse(
-          'wss://demo.piesocket.com/v3/channel_12?api_key=oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm');
-      final channel = WebSocketChannel.connect(wsUrl);
-      await channel.ready;
-      _controller.addStream(channel.stream);
-    } catch (e) {
-      _controller.sink.addError("error!");
-      _controller.close();
-    }
-  }
-
-  Stream<dynamic> getStream() {
-    return _controller.stream;
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextFormField(
+                onSaved: (value) => setState(() {
+                      address = value;
+                    }),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Value is Empty";
+                  } else if (value == "123") {
+                    return "Address can not be 123";
+                  }
+                  return null;
+                },
+                keyboardType: TextInputType.streetAddress,
+                decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: "Please Input 2",
+                    helperText: "Ex: Address",
+                    labelText: "Address")),
+          ),
+          ElevatedButton(
+              onPressed: () {
+                var validation = _formKey.currentState?.validate();
+                if (validation != null && validation == true) {
+                  // get values
+                  _formKey.currentState?.save();
+                }
+              },
+              child: const Text("Submit")),
+          Text("form data :$address")
+        ],
+      ),
+    );
   }
 }
