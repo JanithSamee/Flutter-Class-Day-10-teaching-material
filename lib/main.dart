@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 void main(List<String> args) {
   runApp(MaterialApp(
@@ -47,7 +46,7 @@ class MyApp extends StatelessWidget {
               onPressed: () {
                 stream.subToStream("Day 11");
               },
-              child: Text("send")),
+              child: const Text("send")),
         ],
       ),
     );
@@ -64,8 +63,7 @@ class CreateStream {
 
   Future<void> _connect() async {
     try {
-      final wsUrl = Uri.parse(
-          'wss://free.blr2.piesocket.com/v3/1?api_key=QMghjN0QztPGAFC6OHlvh6SNMz1mlvq5l2CHFivi&notify_self=1');
+      final wsUrl = Uri.parse('- websocket url - ');
       channel = IOWebSocketChannel.connect(wsUrl);
       await channel.ready;
       channel.sink.add("Client Connected");
